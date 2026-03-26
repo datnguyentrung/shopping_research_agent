@@ -1,4 +1,4 @@
 httpx
 pandas
 python-dotenv
-
+tenacity

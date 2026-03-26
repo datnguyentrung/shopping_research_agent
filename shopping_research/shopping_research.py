@@ -1,8 +1,17 @@
 import logging
+from typing import Any, Callable
 from google.adk.memory import InMemoryMemoryService
 from google.adk.agents import LlmAgent, SequentialAgent
 from tools.playwright_shopee_tool import intercept_shopee_api
 from util import load_instruction_from_file
+
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +39,7 @@ session_memory = InMemoryMemoryService()
 get_api_data_agent = LlmAgent(
     name="DataTransformationAgent",
     model="gemini-3.1-flash-lite-preview",
-    tools=[intercept_shopee_api],
+    tools=[intercept_shopee_api],  # Sử dụng tool đã map dữ liệu về schema chuẩn
     instruction=load_instruction_from_file("instruction/data_transformation_agent.txt"),
 )
 
@@ -69,5 +78,53 @@ root_agent = SequentialAgent(
     description="Agent nghiên cứu thị trường cho nền tảng thương mại điện tử. Nhận chủ đề sản phẩm, tìm kiếm dữ liệu từ Google Shopping thông qua API, và chuyển đổi dữ liệu đó thành format JSON chuẩn để UI có thể render.",
 )
 
-logger.info("Shopping Research Agent initialized successfully")
+def _is_transient_error(exc: BaseException) -> bool:
+    if isinstance(exc, (TimeoutError, ConnectionError)):
+        return True
 
+    msg = str(exc).lower()
+    transient_tokens = (
+        "timeout",
+        "temporarily",
+        "rate limit",
+        "429",
+        "503",
+        "connection reset",
+        "connection aborted",
+        "deadline exceeded",
+    )
+    return any(token in msg for token in transient_tokens)
+
+
+def _normalize_input(keyword_or_payload: Any) -> Any:
+    if isinstance(keyword_or_payload, str):
+        return {
+            "topic": keyword_or_payload,
+            "target_platform": "google_shopping",
+            "duration_seconds": 45,
+        }
+    return keyword_or_payload
+
+
+def _invoke_root_agent(payload: Any) -> Any:
+    # ADK versions may expose run() differently; fallback keeps backward compatibility.
+    run_fn = getattr(root_agent, "run", None)
+    if callable(run_fn):
+        return run_fn(payload)
+    raise RuntimeError("root_agent does not expose a callable run method in this ADK runtime.")
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception(_is_transient_error),
+    before_sleep=before_sleep_log(logging.getLogger(__name__), logging.WARNING),
+    reraise=True,
+)
+def run_agent_with_retry(keyword_or_payload: Any, invoke_fn: Callable[[Any], Any] | None = None) -> Any:
+    payload = _normalize_input(keyword_or_payload)
+    logger.info("Đang gọi Agent với retry...")
+    runner = invoke_fn or _invoke_root_agent
+    return runner(payload)
+
+logger.info("Shopping Research Agent initialized successfully")

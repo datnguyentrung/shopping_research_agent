@@ -29,24 +29,75 @@ def _run_shopee_logic(keyword: str):
         page = context.new_page()
 
         # ==========================================
-        # HÀM LẮNG NGHE (Sync Version)
+        # HÀM LẮNG NGHE & MAP DỮ LIỆU
         # ==========================================
         def handle_response(response):
             if "api/v4/search/search_items" in response.url and response.status == 200:
                 try:
-                    # Trong sync mode, .json() không cần await
                     data = response.json()
                     items = data.get('items', [])
                     if items:
-                        # Chỉ lấy item_basic và thêm vào list, không map ở đây
-                        for item in items[:5]: # Lấy top 5 sản phẩm
-                            item_basic = item.get('item_basic')
-                            if item_basic:
-                                extracted_data.append(item_basic)
-                except Exception as e:
-                    logger.warning(f"⚠️ Lỗi khi đọc JSON: {e}")
+                        for item in items[:30]:
+                            item_basic = item.get('item_basic', {})
 
-        # Đăng ký sự kiện
+                            shopid = item_basic.get('shopid')
+                            itemid = item_basic.get('itemid')
+
+                            # 1. Ghép URL sản phẩm
+                            product_url = f"https://shopee.vn/product/{shopid}/{itemid}" if shopid and itemid else ""
+
+                            # 2. Xử lý chia giá (loại bỏ phần nghìn tỷ của Shopee)
+                            raw_price = item_basic.get('price', 0)
+                            price_current = float(raw_price) / 100000 if raw_price else 0
+
+                            raw_price_before = item_basic.get('price_before_discount', 0)
+                            price_original = float(raw_price_before) / 100000 if raw_price_before else 0
+
+                            # 3. Ghép link ảnh chính
+                            raw_image = item_basic.get('image', '')
+                            main_image = f"https://down-vn.img.susercontent.com/file/{raw_image}" if raw_image else ""
+
+                            # 4. Xử lý Rating Count (Shopee trả về mảng, index [0] là tổng)
+                            item_rating = item_basic.get('item_rating', {})
+                            rating_count_raw = item_rating.get('rating_count')
+                            if isinstance(rating_count_raw, list) and len(rating_count_raw) > 0:
+                                rating_count = rating_count_raw[0]
+                            else:
+                                rating_count = rating_count_raw if isinstance(rating_count_raw, (int, float)) else 0
+
+                            # 5. Xử lý tier_variations: Loại bỏ 'images', chỉ giữ 'name' và 'options'
+                            raw_variations = item_basic.get('tier_variations', [])
+                            clean_variations = []
+                            for v in raw_variations:
+                                clean_variations.append({
+                                    "name": v.get("name", ""),
+                                    "options": v.get("options", [])
+                                })
+
+                            # 6. Map vào Object chuẩn
+                            mapped_item = {
+                                "platform": "shopee",
+                                "product_id": itemid,
+                                "name": item_basic.get('name'),
+                                "price_current": price_current,
+                                "price_original": price_original,
+                                "currency": "VND",
+                                "main_image": main_image,
+                                "rating_star": item_rating.get('rating_star', 0),
+                                "rating_count": rating_count,
+                                "sold_count": item_basic.get('historical_sold', 0),
+                                "shop": {
+                                    "shop_id": shopid,
+                                    "shop_name": "",  # Search API Shopee thường không có tên shop ở đây
+                                    "shop_location": item_basic.get('shop_location')
+                                },
+                                "tier_variations": clean_variations,
+                                "product_url": product_url
+                            }
+                            extracted_data.append(mapped_item)
+                except Exception as e:
+                    logger.warning(f"⚠️ Lỗi khi đọc/map JSON: {e}")
+
         page.on("response", handle_response)
 
         try:
@@ -78,3 +129,4 @@ if __name__ == "__main__":
         # Dữ liệu trả về giờ là dict, cần truy cập bằng key
         price = float(item.get('price', 0)) / 100000
         print(f"Product: {item.get('name', 'N/A')} - Price: {price} VND")
+        print(f"Thông tin chi tiết (raw): {item}\n")
