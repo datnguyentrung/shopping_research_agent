@@ -1,9 +1,15 @@
 import argparse
+import asyncio
 import json
+import sys
 
 from util import ensure_api_key_configured
 
 from shopping_research import shopping_research
+
+# Workaround for Playwright's NotImplementedError on Windows
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 def build_input(topic: str) -> dict:
@@ -20,7 +26,6 @@ def main() -> None:
     args = parser.parse_args()
 
     ensure_api_key_configured()
-
 
     print("Loaded root agent:", shopping_research.root_agent.name)
     print("Sample input payload:")

@@ -4,25 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43bf9a70-92ce-4413-8540-81fc69c4a1a1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/Shopping_Research_Agent.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/instruction/product_urls_agent_instruction.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shopping_research/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shopping_research/shopping_research.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_main.http" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/search_json_api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/tavily_tools.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util.py" afterDir="false" />
+    <list default="true" id="43bf9a70-92ce-4413-8540-81fc69c4a1a1" name="Changes" comment="Add initial implementation of Shopping Research Agent with API integration and environment configuration">
+      <change afterPath="$PROJECT_DIR$/nodemon.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/schemas/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/schemas/captured_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/crawl4ai_lazada_tools.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/crawl_shopee_direct.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/playwright_shopee_tool.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/shopee_v2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/list_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instruction/product_urls_agent_instruction.txt" beforeDir="false" afterPath="$PROJECT_DIR$/instruction/data_transformation_agent.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopping_research/.adk/session.db" beforeDir="false" afterPath="$PROJECT_DIR$/shopping_research/.adk/session.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopping_research/shopping_research.py" beforeDir="false" afterPath="$PROJECT_DIR$/shopping_research/shopping_research.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/search_json_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/search_json_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tavily_tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tavily_tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,8 +35,8 @@
   </component>
   <component name="CopilotUserSelectedModel">
     <selectedModels>
-      <entry key="chat-panel" value="Claude Haiku 4.5" />
-      <entry key="agent-panel" value="Claude Haiku 4.5" />
+      <entry key="chat-panel" value="Gemini 2.5 Pro" />
+      <entry key="agent-panel" value="Gemini 2.5 Pro" />
     </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -72,7 +71,15 @@
   "keyToString": {
     "FastAPI.Shopping_Research_Agent.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests in tavily_tools.py.executor": "Run",
+    "Python.crawl4ai_lazada_tools.executor": "Run",
+    "Python.crawl4ai_tools.executor": "Run",
+    "Python.crawl_shopee_direct.executor": "Run",
+    "Python.list_agent.executor": "Run",
+    "Python.playwright_shopee_tool (1).executor": "Run",
     "Python.search_json_api.executor": "Run",
+    "Python.shopee_v2.executor": "Run",
+    "Python.tavily_tools.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -102,8 +109,8 @@
       <recent name="D:\Thực tập MB\Shopping_Research_Agent\test" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.tavily_tools">
-    <configuration name="search_json_api" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.list_agent">
+    <configuration name="crawl_shopee_direct" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shopping_Research_Agent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -118,7 +125,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/search_json_api.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/crawl_shopee_direct.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -127,7 +134,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="tavily_tools" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="list_agent" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Shopping_Research_Agent" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/list_agent.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="playwright_shopee_tool (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Shopping_Research_Agent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -142,7 +173,55 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/tavily_tools.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/playwright_shopee_tool.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="playwright_shopee_tool" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Shopping_Research_Agent" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tools" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="D:\Thực tập MB\Shopping_Research_Agent\tools\playwright_shopee_tool.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="shopee_v2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Shopping_Research_Agent" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tools" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/shopee_v2.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -179,28 +258,13 @@
       <option name="launchJavascriptDebuger" value="false" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests in tavily_tools.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="Shopping_Research_Agent" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="RUN_TOOL" value="" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tools/tavily_tools.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.tavily_tools" />
-        <item itemvalue="Python tests.Python tests in tavily_tools.py" />
-        <item itemvalue="Python.search_json_api" />
+        <item itemvalue="Python.list_agent" />
+        <item itemvalue="Python.playwright_shopee_tool (1)" />
+        <item itemvalue="Python.playwright_shopee_tool" />
+        <item itemvalue="Python.shopee_v2" />
+        <item itemvalue="Python.crawl_shopee_direct" />
       </list>
     </recent_temporary>
   </component>
@@ -222,16 +286,47 @@
       <workItem from="1774234939955" duration="3086000" />
       <workItem from="1774248133728" duration="8927000" />
       <workItem from="1774317368815" duration="7215000" />
-      <workItem from="1774334704097" duration="13734000" />
+      <workItem from="1774334704097" duration="13901000" />
+      <workItem from="1774397739927" duration="9577000" />
+      <workItem from="1774488722693" duration="7574000" />
     </task>
+    <task id="LOCAL-00001" summary="Add initial implementation of Shopping Research Agent with API integration and environment configuration">
+      <option name="closed" value="true" />
+      <created>1774350816570</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1774350816570</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add initial implementation of Shopping Research Agent with API integration and environment configuration">
+      <option name="closed" value="true" />
+      <created>1774350829950</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1774350829950</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add initial implementation of Shopping Research Agent with API integration and environment configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add initial implementation of Shopping Research Agent with API integration and environment configuration" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Shopping_Research_Agent$Shopping_Research_Agent.coverage" NAME="Shopping_Research_Agent Coverage Results" MODIFIED="1774257678688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$search_json_api.coverage" NAME="search_json_api Coverage Results" MODIFIED="1774350551473" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$list_agent.coverage" NAME="list_agent Coverage Results" MODIFIED="1774494655438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$playwright_shopee_tool__1_.coverage" NAME="playwright_shopee_tool (1) Coverage Results" MODIFIED="1774493321664" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$.coverage" NAME=" Coverage Results" MODIFIED="1774350736974" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$crawl4ai_tools.coverage" NAME="crawl4ai_tools Coverage Results" MODIFIED="1774490101127" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$search_json_api.coverage" NAME="search_json_api Coverage Results" MODIFIED="1774399775669" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$tavily_tools.coverage" NAME="tavily_tools Coverage Results" MODIFIED="1774398006850" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$shopee_v2.coverage" NAME="shopee_v2 Coverage Results" MODIFIED="1774489765874" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$crawl4ai_lazada_tools.coverage" NAME="crawl4ai_lazada_tools Coverage Results" MODIFIED="1774408106799" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
+    <SUITE FILE_PATH="coverage/Shopping_Research_Agent$crawl_shopee_direct.coverage" NAME="crawl_shopee_direct Coverage Results" MODIFIED="1774488835362" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tools" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

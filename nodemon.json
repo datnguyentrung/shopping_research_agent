@@ -1,0 +1,5 @@
+{
+  "exec": "adk web",
+  "ext": "py,txt,env,json",
+  "ignore": ["__pycache__/*", "logs/*"]
+}

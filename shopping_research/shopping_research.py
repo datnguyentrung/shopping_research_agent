@@ -1,7 +1,7 @@
 import logging
 from google.adk.memory import InMemoryMemoryService
 from google.adk.agents import LlmAgent, SequentialAgent
-from tools.search_json_api import search_and_extract, extract_from_url, filter_product_urls
+from tools.playwright_shopee_tool import intercept_shopee_api
 from util import load_instruction_from_file
 
 # Setup logging
@@ -27,38 +27,46 @@ session_memory = InMemoryMemoryService()
 # ==========================================
 
 # Agent 2: Product URLs Agent - Tìm kiếm URL từ dữ liệu Merchant API cho trước
-product_urls_agent = LlmAgent(
-    name="ProductURLsAgent",
-    model="gemini-2.5-flash-lite",
-    tools=[search_and_extract, extract_from_url, filter_product_urls],
-    instruction=load_instruction_from_file("instruction/product_urls_agent_instruction.txt"),
+get_api_data_agent = LlmAgent(
+    name="DataTransformationAgent",
+    model="gemini-3.1-flash-lite-preview",
+    tools=[intercept_shopee_api],
+    instruction=load_instruction_from_file("instruction/data_transformation_agent.txt"),
 )
 
-# Agent 3: Generator UI (A2UI Protocol) - Chuyển đổi dữ liệu thành JSON cho React
-ui_generator_agent = LlmAgent(
-    name="ResponseGenerationAgent",
-    model="gemini-2.5-flash-lite",
-    instruction="""
-    Nhận dữ liệu sản phẩm đã có URL từ Product URLs Agent.
-    Ép kiểu dữ liệu sản phẩm thành JSON chuẩn để React render:
-    {
-      "component": "SwipeableProductCard",
-      "data": [
-         {"name": "...", "price": "...", "description": "...", "image_url": "...", "checkout_mb": true, "url": "..."}
-      ]
-    }
-    Chỉ xuất JSON thuần, không bọc markdown.
-    Thêm URL từ dữ liệu vào.
-    """,
-)
+# # Agent 3: Generator UI (A2UI Protocol) - Chuyển đổi dữ liệu thành JSON cho React
+# ui_generator_agent = LlmAgent(
+#     name="ResponseGenerationAgent",
+#     model="gemini-3.1-flash-lite-preview",
+#     instruction="""
+#     Nhận mảng dữ liệu sản phẩm (chuẩn CapturedData) từ Data Transformation Agent.
+#     Nhiệm vụ của bạn là ép kiểu dữ liệu đó thành JSON chuẩn để React render theo format sau:
+#     {
+#       "component": "SwipeableProductCard",
+#       "data": [
+#          {
+#            "name": "Tên sản phẩm",
+#            "price": "Giá bán hiện tại (lấy từ price_current, định dạng chuỗi có VNĐ, vd: 285.000đ)",
+#            "description": "Tên shop hoặc thông tin thêm",
+#            "image_url": "Lấy từ main_image",
+#            "checkout_mb": true,
+#            "url": "Lấy từ product_url"
+#          }
+#       ]
+#     }
+#     Quy tắc:
+#     - Chỉ xuất JSON thuần, KHÔNG bọc markdown (không dùng ```json).
+#     - Map chính xác các trường từ CapturedData sang format của React UI.
+#     """,
+# )
 
 # ==========================================
 # 4. ORCHESTRATOR - GỘP CÁC AGENT LẠI
 # ==========================================
 root_agent = SequentialAgent(
     name="Shopping_Research_Agent",
-    sub_agents=[product_urls_agent, ui_generator_agent],
-    description="Luồng tuần tự: Nhận dữ liệu từ Merchant API -> Product URLs Agent tìm URL trên web -> UI Generator chuyển thành JSON cho React render.",
+    sub_agents=[get_api_data_agent],
+    description="Agent nghiên cứu thị trường cho nền tảng thương mại điện tử. Nhận chủ đề sản phẩm, tìm kiếm dữ liệu từ Google Shopping thông qua API, và chuyển đổi dữ liệu đó thành format JSON chuẩn để UI có thể render.",
 )
 
 logger.info("Shopping Research Agent initialized successfully")
