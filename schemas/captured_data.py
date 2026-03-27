@@ -38,3 +38,6 @@ class CapturedData(BaseModel):
 
     # -- Phân loại hàng --
     tier_variations: List[TierVariation] = []  # Danh sách các biến thể
+
+class ProductList(BaseModel):
+    products: List[CapturedData]  # Danh sách sản phẩm đã trích xuất

@@ -1,20 +1,16 @@
+import json
 import os
 import logging
-import json
 import re
 import requests
 from typing import List
 from urllib.parse import urljoin, urlparse, parse_qs, urlencode, urlunparse
-from dotenv import load_dotenv
-from tavily import TavilyClient
 
-from tools.playwright_tools import _extract_price_from_text, extract_with_js
+from config.init_clients import tavily_client
 
-load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 ASSET_EXTENSIONS = (
     ".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg", ".bmp",
@@ -189,108 +185,62 @@ def parse_product_links(text: str, base_url: str) -> List[str]:
     return final_links
 
 
-def deep_search_and_extract_products(keyword: str, max_pages: int = 3):
+def deep_search_and_extract_products(keyword: str, max_pages: int = 20):
     try:
-        logger.info(f"Đang tìm kiếm nguồn cho: {keyword}")
-        # Đổi query để tìm trực tiếp trang sản phẩm hơn là trang danh mục
+        # TẠO CÚ PHÁP TÌM KIẾM CHUYÊN SÂU (GOOGLE DORK)
+        # Ép Tavily chỉ tìm trong các sàn TMĐT lớn của Việt Nam
+        target_domains = [
+            "site:tiki.vn",
+            "site:lazada.vn",
+            "site:tokyolife.vn",
+            "site:santino.com.vn/product"  # Lọc thẳng vào thư mục product, bỏ qua blog
+        ]
+        domain_query = " OR ".join(target_domains)
+
+        # Thêm các từ khóa bắt buộc phải có trên trang để loại bỏ bài viết Blog
+        required_terms = '"giá" "đã bán" "đánh giá"'
+
+        optimized_query = f"{keyword} {domain_query} {required_terms}"
+
+        logger.info(f"Đang tìm kiếm với query tối ưu: {optimized_query}")
+
         search_response = tavily_client.search(
-            query=f"mua {keyword} chính hãng giá",
+            query=optimized_query,
             search_depth="advanced",
-            include_raw_content=True,
+            # KHÔNG CẦN include_raw_content ở bước này để tăng tốc
+            include_raw_content=False,
             max_results=max_pages
         )
 
-        primary_urls = []
-        secondary_urls = []
+        results = search_response.get("results", [])
 
-        results = search_response.get("results") if isinstance(search_response, dict) else []
-        if not isinstance(results, list):
-            results = []
+        cleaned_results = []
+        for item in results:
+            url = item.get("url", "")
+            title = item.get("title", "")
+            content = item.get("content", "")  # Mô tả ngắn (Snippet)
 
-        for result in results:
-            if not isinstance(result, dict):
+            # Bỏ qua nếu là link danh mục/blog (Kiểm tra lại lần nữa cho chắc)
+            if any(r in url.lower() for r in ["/blog/", "/danh-muc/", "/category/", "/collection/"]):
                 continue
 
-            main_url = result.get("url") or ""
-            if main_url:
-                clean_main_url = clean_tracking_url(main_url)
-                if _score_url(clean_main_url) >= 0:
-                    primary_urls.append(clean_main_url)
+            cleaned_results.append({
+                "url": clean_tracking_url(url),
+                "title": title,
+                "snippet": content,  # Dùng tạm mô tả ngắn này cho Agent 1
+                "source": "tavily_search"
+            })
 
-            # Vẫn cào thêm link bên trong, nhưng xếp vào nhóm ưu tiên thấp
-            links = parse_product_links(result.get("raw_content") or "", main_url)
-            secondary_urls.extend(links)
+        logger.info(f"Tìm thấy {len(cleaned_results)} sản phẩm hợp lệ từ Search.")
 
-        all_candidate_urls = primary_urls + secondary_urls
-
-        # Lọc trùng theo thứ tự xuất hiện, sau đó xếp hạng để ưu tiên trang giống sản phẩm.
-        seen = set()
-        scored_candidates = []
-        for idx, u in enumerate(all_candidate_urls):
-            if not u or u in seen:
-                continue
-            seen.add(u)
-
-            score = _score_url(u)
-            if score < 0:
-                continue
-            scored_candidates.append((score, idx, u))
-
-        scored_candidates.sort(key=lambda x: (-x[0], x[1]))
-        final_urls = [url for _, __, url in scored_candidates[:20]] # Giới hạn tối đa 20 URL để tránh quá tải
-
-        if not final_urls:
-            return {"error": "Không tìm thấy link sản phẩm hợp lệ."}
-
-        logger.info(f"Gửi đi {len(final_urls)} URL sạch: {final_urls}")
-
-        results = []
-        batch_size = 20  # Chia thành từng lô tối đa 20 URLs
-
-        for i in range(0, len(final_urls), batch_size):
-            batch_urls = final_urls[i:i + batch_size]
-            try:
-                logger.info(f"Đang extract lô từ {i} đến {i + len(batch_urls)}...")
-                extracted = tavily_client.extract(urls=batch_urls)
-
-                # Tùy thuộc vào cấu trúc trả về của Tavily, thường nó là 1 dict có list results bên trong
-                # Bạn có thể append nguyên cụm hoặc dùng extend để gom chung thành 1 list phẳng
-                results.extend(extracted.get("results", []) if isinstance(extracted, dict) else [])
-            except Exception as e:
-                logger.error(f"Lỗi khi extract lô URL: {e}")
-
-        return {"results": results}  # ← Luôn trả về dict
+        # TRẢ VỀ LUÔN, KHÔNG GỌI TAVILY EXTRACT Ở ĐÂY NỮA
+        return {"results": cleaned_results}
 
     except Exception as e:
         logger.error(f"Lỗi hệ thống: {str(e)}")
         return {"error": str(e)}
 
-def extract(url: str):
-    print(f"--- Đang trích xuất dữ liệu từ: {url} ---")
 
-    try:
-        response = tavily_client.extract(urls=[url])
-        if response and response.get("results"):
-            data = response["results"][0]
-            raw_text = data.get("raw_content", "")
-
-            # Kiểm tra có giá trong nội dung không
-            price = _extract_price_from_text(raw_text)
-
-            if price:
-                print(f"✅ Tavily lấy được giá: {price}")
-                return {**data, "price": price, "source": "tavily"}
-            else:
-                print("⚠️ Tavily không có giá → fallback Playwright...")
-    except Exception as e:
-        print(f"❌ Lỗi khi gọi API: {str(e)}")
-
-    result = extract_with_js(url)
-    result["source"] = "playwright"
-
-    print(
-        f"{'✅' if 'price' in result else '❌'} Playwright: {result.get('price', result.get('error', 'Không tìm thấy giá'))}")
-    return result
 
 # def tavily_search_and_extract(keyword: str):
 #     search_results = deep_search_and_extract_products(keyword)
@@ -306,21 +256,18 @@ def extract(url: str):
 #     else:
 #         print(json.dumps(search_results, indent=2, ensure_ascii=False))
 
-# if __name__ == "__main__":
-#     keyword = "áo khoác nữ"
-#     results = deep_search_and_extract_products(keyword)
-#
-#     if "results" in results:
-#         print(f"\n✅ TRÍCH XUẤT THÀNH CÔNG {len(results['results'])} SẢN PHẨM")
-#         for item in results["results"]:
-#             if not isinstance(item, dict):
-#                 continue
-#             title = str(item.get("title") or "Không có tiêu đề")
-#             link = str(item.get("url") or "")
-#             print(f"- {title[:60]}... \n  Link: {link}\n")
-#     else:
-#         print(json.dumps(results, indent=2, ensure_ascii=False))
-
 if __name__ == "__main__":
-    target_url = "https://tiki.vn/ta-quan-cao-cap-moony-nhat-ban-be-gai-l44-44-mieng-p412767.html?spid=115706"
-    extract(target_url)
+    keyword = "áo khoác bomber nam chính hãng"
+    results = deep_search_and_extract_products(keyword)
+
+    if "results" in results:
+        print(f"\n✅ TRÍCH XUẤT THÀNH CÔNG {len(results['results'])} SẢN PHẨM")
+        for item in results["results"]:
+            if not isinstance(item, dict):
+                continue
+            title = str(item.get("title") or "Không có tiêu đề")
+            link = str(item.get("url") or "")
+            info = str(item)
+            print(f"- {title[:60]}... \n  Link: {link}\n" f"  Thông tin chi tiết (raw): {info}\n")
+    else:
+        print(json.dumps(results, indent=2, ensure_ascii=False))

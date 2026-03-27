@@ -1,9 +1,11 @@
 import logging
+from dotenv import load_dotenv
 from typing import Any, Callable
-from google.adk.memory import InMemoryMemoryService
 from google.adk.agents import LlmAgent, SequentialAgent
-from tools.playwright_shopee_tool import intercept_shopee_api
-from util import load_instruction_from_file
+from google.adk.memory import InMemoryMemoryService
+
+from tools.search_and_extract.playwright_shopee_tool import intercept_shopee_api
+from utils.util import load_instruction_from_file
 
 from tenacity import (
     before_sleep_log,
@@ -13,8 +15,10 @@ from tenacity import (
     wait_exponential,
 )
 
+load_dotenv()
+
 # Setup logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # ==========================================

@@ -4,19 +4,20 @@ import os
 from dotenv import load_dotenv
 
 
-def load_instruction_from_file(file_name: str) -> str:
-    """Load a prompt file located next to this module."""
-    base_dir = Path(__file__).resolve().parent
-    instruction_path = base_dir / file_name
+def load_instruction_from_file(file_path):
+    # __file__ đang là vị trí của util.py
+    # os.path.dirname(__file__) sẽ là thư mục utils
+    # os.path.dirname(...) lần nữa sẽ lùi ra thư mục gốc Shopping_Research_Agent
+    base_dir = os.path.dirname(os.path.dirname(__file__))
 
-    if not instruction_path.exists():
-        raise FileNotFoundError(f"Instruction file not found: {instruction_path}")
+    # Ghép path chuẩn
+    full_path = os.path.join(base_dir, file_path)
 
-    content = instruction_path.read_text(encoding="utf-8").strip()
-    if not content:
-        raise ValueError(f"Instruction file is empty: {instruction_path}")
+    if not os.path.exists(full_path):
+        raise FileNotFoundError(f"Instruction file not found: {full_path}")
 
-    return content
+    with open(full_path, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 def bootstrap_api_env() -> str | None:

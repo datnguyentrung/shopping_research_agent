@@ -1,9 +1,12 @@
 import argparse
 import asyncio
 import json
+import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
 
-from util import ensure_api_key_configured
+from utils.util import ensure_api_key_configured
 
 from shopping_research import shopping_research
 
